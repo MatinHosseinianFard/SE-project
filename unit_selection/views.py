@@ -195,7 +195,7 @@ def Suggest(request):
 
                 if not possiblie:
                     break
-                
+
                 informations.append(
                     {
                         "name": section["name"],
@@ -251,10 +251,11 @@ def Suggest(request):
             message = "برنامه ای با این دروس امکان پذیر نیست"
         else:
             message = "برنامه ای با این دروس و تعداد واحد مدنظر وجود ندارد"
+
     paginator = Paginator(tables, 1)
     page_number = request.GET.get('page')
     tables = paginator.get_page(page_number)
-    # print(tables[0])
+
     return render(request, "suggest.html", {
         "tables": tables,
         "search": search,
@@ -266,7 +267,6 @@ def Suggest(request):
 def addFavourite(request):
     if request.method == 'POST':
         var = dict(request.POST)
-        # print(var)
         courses_pk = ""
         sections_pk = ""
         count = (len(var)-27)//10
@@ -292,68 +292,80 @@ def addFavourite(request):
 @login_required(login_url='/accounts/login/')
 def seeFavourite(request):
     favourites = Favourite.objects.filter(owner=request.user)
-    tables = []
     error = False
+    tables = []
+
     for fav in favourites:
-        courses_pk = [int(pk) for pk in fav.courses_pk.split(" ")]
-        sections_pk = [int(pk) for pk in fav.sections_pk.split(" ")]
-        courses_name = Course.objects.filter(pk__in=courses_pk)
-        courses = []
-        tot_credist = 0
-        if len(courses_pk) != len(list(courses_name)):
-            error = True
+
+        favourite_courses_pk = [int(pk) for pk in fav.courses_pk.split(" ")]
+        favourite_sections_pk = [int(pk) for pk in fav.sections_pk.split(" ")]
+
+        courses_name = Course.objects.filter(pk__in=favourite_courses_pk)
+        sections = []
+        tot_credits = 0
+
+        if len(favourite_courses_pk) != len(list(courses_name)):
             Favourite.objects.filter(owner=request.user, pk=fav.pk).delete()
+            error = True
             continue
+
         for course in courses_name:
-            sections = Section.objects.filter(
-                course=course, pk__in=sections_pk)
-            if len(list(sections)) != 1:
-                error = True
+            course_sections = Section.objects.filter(
+                course=course, pk__in=favourite_sections_pk)
+            
+            if len(list(course_sections)) != 1:
                 Favourite.objects.filter(
                     owner=request.user, pk=fav.pk).delete()
+                error = True
                 break
-            dic_list = []
-            tot_credist += course.credits
-            for section in sections:
-                dic = {}
-                dic["name"] = f"{course.name}"
-                dic["instructor"] = section.instructor.name
-                dic["credit"] = course.credits
-                dic["code"] = section.code
-                dic["gender"] = section.gender
-                dic["exam_date"] = course.exam_date
-                dic["exam_time"] = course.exam_time
-                dic["time"] = [
-                    f"{time.day} {time.start}-{time.end}" for time in section.times.all()]
-                dic["course_pk"] = course.pk
-                dic["section_pk"] = section.pk
-                dic_list.append(dic)
-            courses.append(dic_list)
+            
+            course_sections_info = []
+            tot_credits += course.credits
+
+            for section in course_sections:
+                section_info = {
+                    "name": str(course.name),
+                    "instructor": section.instructor.name,
+                    "credit": course.credits,
+                    "code": section.code,
+                    "gender": section.gender,
+                    "exam_date": course.exam_date,
+                    "exam_time": course.exam_time,
+                    "time": [
+                        f"{time.day} {time.start}-{time.end}" for time in section.times.all()],
+                    "course_pk": course.pk,
+                    "section_pk": section.pk
+                }
+                course_sections_info.append(section_info)
+            
+            sections.append(course_sections_info)
 
         if error:
             continue
-        state = [[1] for _ in range(len(sections_pk))]
 
-        informations = []
+        state = [[1] for _ in range(len(favourite_sections_pk))]
+
         copy_flag = deepcopy(flag)
+        informations = []
         possiblie = True
+
         for i, element in enumerate(state):
 
-            section = courses[i][0]
+            section = sections[i][0]
             times = section["time"]
 
             for time in times:
                 day, section_time = time.split(" ")
                 if not copy_flag[day][section_time]:
-                    # copy_flag[day][section_time] = "{}".format(
-                    #     section["name"])
                     copy_flag[day][section_time] = "{}".format(
                         section["name"] if len(section["name"]) <= 30 else section["name"][:30]+"..")
                 else:
                     possiblie = False
                     break
+            
             if not possiblie:
                 break
+            
             informations.append(
                 {
                     "name": section["name"],
@@ -369,34 +381,40 @@ def seeFavourite(request):
                     "exam_conflict": False
                 },
             )
+        
         if not possiblie:
             error = True
             Favourite.objects.filter(owner=request.user, pk=fav.pk).delete()
             continue
+        
         informations.sort(
             key=lambda item: item["exam_date"], reverse=False)
-        informations.sort(
-            key=lambda item: item["exam_date"], reverse=False)
+
         for i in range(len(informations)-1):
             if informations[i]["exam_date"] == "0":
                 continue
             if informations[i]["exam_date"] == informations[i+1]["exam_date"]:
                 informations[i]["exam_conflict"] = True
                 informations[i+1]["exam_conflict"] = True
-        copy_flag["total_credit"] = tot_credist
+
+        copy_flag["total_credit"] = tot_credits
         copy_flag["informations"] = informations
         copy_flag["favourite_pk"] = fav.pk
+
         tables.append(copy_flag)
 
         tables = sorted(
             tables, key=lambda item: item["total_credit"], reverse=True)
+
     if len(tables) == 0:
         notice = True
     else:
         notice = False
+
     paginator = Paginator(tables, 1)
     page_number = request.GET.get('page')
     tables = paginator.get_page(page_number)
+    
     return render(request, "favourite.html", {
         "tables": tables,
         "notice": notice,
