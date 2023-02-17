@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     
     'nested_admin',
     'unit_selection',
+    
     'accounts',
+    'api.apps.ApiConfig',
 ]
 
 AUTH_USER_MODEL = "accounts.CustomUser"
