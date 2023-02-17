@@ -1,18 +1,22 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
+
 class Favourite(models.Model):
-    owner = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="favourites")
+    owner = models.ForeignKey(
+        get_user_model(), on_delete=models.CASCADE, related_name="favourites")
     sections_pk = models.CharField(max_length=255)
     courses_pk = models.CharField(max_length=255)
-    
+
     def __str__(self) -> str:
         return f"{self.owner.username} {self.courses_pk}"
+
+
 class Departemant(models.Model):
     name = models.CharField(max_length=255)
 
     def __str__(self) -> str:
-        return self.name 
+        return self.name
 
 
 class Instructor(models.Model):
@@ -28,7 +32,8 @@ class Course(models.Model):
     name = models.CharField(max_length=255)
     credits = models.PositiveIntegerField(default=1)
     status = models.BooleanField(default=False)
-    dept_name = models.ForeignKey(Departemant, on_delete=models.CASCADE, null=True, related_name="courses")
+    dept_name = models.ForeignKey(
+        Departemant, on_delete=models.CASCADE, null=True, related_name="courses")
     exam_date = models.CharField(max_length=10, default="0")
     exam_time = models.CharField(max_length=10, default="0")
 
@@ -47,7 +52,8 @@ class Section(models.Model):
     instructor = models.ForeignKey(
         Instructor, on_delete=models.CASCADE, related_name="sections")
     code = models.CharField(max_length=255, default="0")
-    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, default="مختلط")
+    gender = models.CharField(
+        max_length=10, choices=GENDER_CHOICES, default="مختلط")
 
     def __str__(self) -> str:
         return f"{self.course} {self.code[-2:]}"
