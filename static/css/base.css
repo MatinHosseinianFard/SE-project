@@ -1,0 +1,59 @@
+@import url("https://fonts.googleapis.com/css2?family=Lato:wght@300&display=swap");
+@font-face {
+  font-family: "Tanha";
+  src: url("../font/Shabnam.eot") format("eot");
+  src: url("../font/Shabnam.woff") format("woff");
+  src: url("../font/Shabnam.ttf") format("ttf");
+  src: url("../font/Shabnam.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+  background-color: rgb(228, 227, 227);
+  /* background-image: url("../images/cool-background.jpg"); */
+}
+.must-light {
+  background-color: #fff;
+  border-radius: 10px;
+}
+body ::-webkit-scrollbar {
+  display: none;
+}
+
+.sidebar ::-webkit-scrollbar {
+  display: block;
+}
+
+::-webkit-scrollbar {
+  width: 15px;
+}
+
+.sidebar ::-webkit-scrollbar-track {
+  background: none;
+}
+.sidebar ::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+
+.nav-item::after {
+  content: '';
+  display: block;
+  width: 0px;
+  height: 2px;
+  background: #555a5c;
+}
+
+.nav-item:hover::after {
+  width: 100%
+}
