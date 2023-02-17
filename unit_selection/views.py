@@ -11,44 +11,45 @@ from django.http import HttpResponse
 from .models import Section, Course, Departemant, Favourite
 
 flag = {
-            "شنبه": {
-                "8-9.5": False,
-                "10-11.5": False,
-                "13.5-15": False,
-                "15.5-17": False,
-                "17.5-19": False,
-            },
-            "یکشنبه": {
-                "8-9.5": False,
-                "10-11.5": False,
-                "13.5-15": False,
-                "15.5-17": False,
-                "17.5-19": False,
-            },
-            "دوشنبه": {
-                "8-9.5": False,
-                "10-11.5": False,
-                "13.5-15": False,
-                "15.5-17": False,
-                "17.5-19": False,
-            },
-            "سشنبه": {
-                "8-9.5": False,
-                "10-11.5": False,
-                "13.5-15": False,
-                "15.5-17": False,
-                "17.5-19": False,
-            },
-            "چهارشنبه": {
-                "8-9.5": False,
-                "10-11.5": False,
-                "13.5-15": False,
-                "15.5-17": False,
-                "17.5-19": False,
-            },
-            "total_credit": 0,
-            "informations": []
-        }
+    "شنبه": {
+        "8-9.5": False,
+        "10-11.5": False,
+        "13.5-15": False,
+        "15.5-17": False,
+        "17.5-19": False,
+    },
+    "یکشنبه": {
+        "8-9.5": False,
+        "10-11.5": False,
+        "13.5-15": False,
+        "15.5-17": False,
+        "17.5-19": False,
+    },
+    "دوشنبه": {
+        "8-9.5": False,
+        "10-11.5": False,
+        "13.5-15": False,
+        "15.5-17": False,
+        "17.5-19": False,
+    },
+    "سشنبه": {
+        "8-9.5": False,
+        "10-11.5": False,
+        "13.5-15": False,
+        "15.5-17": False,
+        "17.5-19": False,
+    },
+    "چهارشنبه": {
+        "8-9.5": False,
+        "10-11.5": False,
+        "13.5-15": False,
+        "15.5-17": False,
+        "17.5-19": False,
+    },
+    "total_credit": 0,
+    "informations": []
+}
+
 
 class AboutPageView(TemplateView):
     template_name = "about.html"
@@ -76,7 +77,9 @@ def Suggest(request):
     search = request.GET.get("search")
     if search not in (None, 'None', '') and not search.isdigit():
         search = None
+
     tables = request.session.get("tables")
+
     if request.POST.getlist("choosed"):
         choosed = request.POST.getlist("choosed")
         request.session["choosed"] = choosed
@@ -85,93 +88,97 @@ def Suggest(request):
         choosed = request.session.get("choosed")
         if choosed == None:
             return redirect("home")
-        if tables in (None, 'None', '',):
+        if tables in (None, 'None', ''):
             tables = None
-    if tables in (None, 'None', '',):
 
+    if tables in (None, 'None', ''):
         def get_courses_pk(item): return int(item.split(" ")[0])
         def get_sections_pk(item): return int(item.split(" ")[1])
 
-        courses_choosed = {get_courses_pk(i) for i in choosed}
-        sections_choosed = [get_sections_pk(i) for i in choosed]
+        selected_courses = {get_courses_pk(i) for i in choosed}
+        selected_sections = [get_sections_pk(i) for i in choosed]
 
-        courses_name = Course.objects.filter(pk__in=courses_choosed)
+        courses_name = Course.objects.filter(pk__in=selected_courses)
         min_credit = 0
-        courses = []
+        sections = []
         for course in courses_name:
-            sections = Section.objects.filter(
-                course=course, pk__in=sections_choosed)
-            dic_list = []
+            course_sections = Section.objects.filter(
+                course=course, pk__in=selected_sections)
             min_credit += course.credits
-            for section in sections:
-                dic = {}
-                dic["name"] = f"{course.name}"
-                dic["instructor"] = section.instructor.name
-                dic["credit"] = course.credits
-                dic["code"] = section.code
-                dic["gender"] = section.gender
-                dic["exam_date"] = course.exam_date
-                dic["exam_time"] = course.exam_time
-                dic["time"] = [
-                    f"{time.day} {time.start}-{time.end}" for time in section.times.all()]
-                dic_list.append(dic)
-                dic["course_pk"] = course.pk
-                dic["section_pk"] = section.pk
-            courses.append(dic_list)
+            course_sections_info = []
+            for section in course_sections:
+                section_info = {
+                    "name": str(course.name),
+                    "instructor": section.instructor.name,
+                    "credit": course.credits,
+                    "code": section.code,
+                    "gender": section.gender,
+                    "exam_date": course.exam_date,
+                    "exam_time": course.exam_time,
+                    "time": [
+                        f"{time.day} {time.start}-{time.end}" for time in section.times.all()],
+                    "course_pk": course.pk,
+                    "section_pk": section.pk
+                }
+                course_sections_info.append(section_info)
+
+            sections.append(course_sections_info)
 
         if min_credit < 12:
             request.session["notice"] = True
             return redirect("home")
-        request.session["notice"] = False
-        courses_flag = []
-        for value in courses:
-            if len(value) == 1:
-                courses_flag.append([[1], [0]])
-            else:
-                l = []
-                s = set(permutations(
-                    [1 if z == 0 else 0 for z in range(len(value))]))
-                s.add(tuple([0 for _ in range(len(value))]))
-                for j in s:
-                    l.append(list(j))
-                courses_flag.append(l)
+        else:
+            request.session["notice"] = False
+
+        sections_permutations = []
+
+        for section in sections:
+            lis = [0 for _ in range(len(section)-1)] + [1]
+
+            s = set(permutations(lis))
+            s.add(tuple([0 for _ in range(len(section))]))
+
+            sections_permutations.append([list(i) for i in s])
+
+        print(sections_permutations)
         states = []
 
-        def func(lis, z, i, n):
+        def state_generator(lis, state, i, n):
             for j in lis[i]:
-                z.append(j)
+                state.append(j)
                 if i != n - 1:
-                    z = func(lis, z, i + 1, n)
+                    state = state_generator(lis, state, i + 1, n)
                 else:
-                    states.append(copy(z))
-                z.pop()
-            return z
+                    states.append(deepcopy(state))
+                state.pop()
+            return state
 
-        for i in courses_flag[0]:
-            z = [i]
-            func(courses_flag, z, 1, courses_name.count())
-        
+        state_generator(sections_permutations, [], 0, courses_name.count())
+
+        for state in states:
+            print(state)
+
         tables = []
-        n = len(states[0])
+        n = courses_name.count()
         for state in states:
             informations = []
             copy_flag = deepcopy(flag)
             total_credit = 0
             possiblie = True
-            for i, element in enumerate(state):
+            for i, section in enumerate(state):
                 if not total_credit + ((n-i)*3) >= 12:
                     break
-                if len(element) == 1:
-                    if element[0] == 1:
-                        section = courses[i][0]
+                elif len(section) == 1:
+                    if section[0] == 1:
+                        section = sections[i][0]
                         total_credit += section["credit"]
                         times = section["time"]
                     else:
                         continue
                 else:
                     try:
-                        element_index = element.index(1)
-                        section = courses[i][element_index]
+                        section_index = section.index(1)
+                        section = sections[i][section_index]
                         total_credit += section["credit"]
                         times = section["time"]
                     except:
@@ -180,8 +187,6 @@ def Suggest(request):
                 for time in times:
                     day, section_time = time.split(" ")
                     if not copy_flag[day][section_time]:
-                        # copy_flag[day][section_time] = "{}".format(
-                        #     section["name"])
                         copy_flag[day][section_time] = "{}".format(
                             section["name"] if len(section["name"]) <= 30 else section["name"][:30]+"..")
                     else:
@@ -190,6 +195,7 @@ def Suggest(request):
 
                 if not possiblie:
                     break
+                
                 informations.append(
                     {
                         "name": section["name"],
@@ -207,14 +213,17 @@ def Suggest(request):
                 )
             informations.sort(
                 key=lambda item: item["exam_date"], reverse=False)
+
             for i in range(len(informations)-1):
                 if informations[i]["exam_date"] == "0":
                     continue
                 if informations[i]["exam_date"] == informations[i+1]["exam_date"]:
-                    informations[i]["exam_conflict"] = True
-                    informations[i+1]["exam_conflict"] = True
                     if informations[i]["exam_time"] == informations[i+1]["exam_time"]:
                         possiblie = False
+                        break
+                    informations[i]["exam_conflict"] = True
+                    informations[i+1]["exam_conflict"] = True
+
             if possiblie and total_credit >= 12:
                 if search not in (None, 'None', ''):
                     if total_credit == int(search):
@@ -224,7 +233,7 @@ def Suggest(request):
                 else:
                     copy_flag["total_credit"] = total_credit
                     copy_flag["informations"] = informations
-                    
+
                     tables.append(copy_flag)
 
         tables = sorted(
@@ -300,7 +309,8 @@ def seeFavourite(request):
                 course=course, pk__in=sections_pk)
             if len(list(sections)) != 1:
                 error = True
-                Favourite.objects.filter(owner=request.user, pk=fav.pk).delete()
+                Favourite.objects.filter(
+                    owner=request.user, pk=fav.pk).delete()
                 break
             dic_list = []
             tot_credist += course.credits
@@ -328,15 +338,15 @@ def seeFavourite(request):
         copy_flag = deepcopy(flag)
         possiblie = True
         for i, element in enumerate(state):
-            
+
             section = courses[i][0]
             times = section["time"]
 
             for time in times:
                 day, section_time = time.split(" ")
                 if not copy_flag[day][section_time]:
-                        # copy_flag[day][section_time] = "{}".format(
-                        #     section["name"])
+                    # copy_flag[day][section_time] = "{}".format(
+                    #     section["name"])
                     copy_flag[day][section_time] = "{}".format(
                         section["name"] if len(section["name"]) <= 30 else section["name"][:30]+"..")
                 else:
@@ -360,16 +370,16 @@ def seeFavourite(request):
                 },
             )
         if not possiblie:
-                error = True
-                Favourite.objects.filter(owner=request.user, pk=fav.pk).delete()
-                continue
+            error = True
+            Favourite.objects.filter(owner=request.user, pk=fav.pk).delete()
+            continue
         informations.sort(
             key=lambda item: item["exam_date"], reverse=False)
         informations.sort(
-                key=lambda item: item["exam_date"], reverse=False)
+            key=lambda item: item["exam_date"], reverse=False)
         for i in range(len(informations)-1):
             if informations[i]["exam_date"] == "0":
-                    continue
+                continue
             if informations[i]["exam_date"] == informations[i+1]["exam_date"]:
                 informations[i]["exam_conflict"] = True
                 informations[i+1]["exam_conflict"] = True
