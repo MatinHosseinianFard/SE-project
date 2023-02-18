@@ -25,8 +25,8 @@ SECRET_KEY = 'django-insecure-7=_)nhle$lpe2*ys&t$ql0n_$2udolnk9e53u#3e!z%sd9b+6a
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ["127.0.0.1", "chrome-extension://eejfoncpjfgmeleakejdcanedmefagga"]
+CSRF_TRUSTED_ORIGINS = ['chrome-extension://eejfoncpjfgmeleakejdcanedmefagga']
 
 # Application definition
 
@@ -145,4 +145,11 @@ LOGOUT_REDIRECT_URL = "home"
 GRAPH_MODELS = {
     "all_applications": True,
     "graph_models": True
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ]
 }
