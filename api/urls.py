@@ -1,8 +1,10 @@
 from django.urls import path
-from .views import HomeApiView
+from .views import home, suggest
 
 app_name = 'api'
 
 urlpatterns = [
-    path('home/', HomeApiView.as_view(), name='home-api')
+    path('home/', home, name='home-api'),
+    path('suggest/', suggest, name='suggest-api')
+
 ]
