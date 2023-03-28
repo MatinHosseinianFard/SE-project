@@ -1,4 +1,5 @@
 from django.urls import reverse_lazy
+from django.views.generic import FormView
 from django.views import generic, View
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
@@ -11,23 +12,21 @@ class SignupPageView(generic.CreateView):
     success_url = reverse_lazy("login")
     template_name = "registration/signup.html"
     
-    
 
-class UserLoginView(View):
+class UserLoginView(FormView):
+    form_class = LoginForm
+    template_name = "registration/login.html"
+    success_url = reverse_lazy("home")
 
-    def post(self, request):
-        form = LoginForm(data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            return redirect("home")
-        else:
-            return render(request, "registration/login.html", {"form": form, "error": "نام کاربری یا رمز عبور اشتباه است"})
-            # return redirect("login")
-    def get(self, request):
-        form = LoginForm()
-        return render(request, "registration/login.html", {"form": form})
-    
+    def form_valid(self, form):
+        user = form.get_user()
+        login(self.request, user)
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form, error="نام کاربری یا رمز عبور اشتباه است"))
+
+
 def UserLogout(request):
     logout(request)
     return redirect("home")

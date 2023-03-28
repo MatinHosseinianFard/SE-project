@@ -1,3 +1,4 @@
+from . import serializers
 import json
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -8,6 +9,9 @@ from django.shortcuts import render, redirect
 from itertools import permutations
 from rest_framework.decorators import api_view
 
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+)
 
 from unit_selection.models import Departemant, Course, Section
 
@@ -50,19 +54,22 @@ flag = {
     "total_credit": 0,
     "informations": []
 }
+from .serializers import CustomTokenObtainPairSerializer
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    # Replace the serializer with your custom
+    serializer_class = CustomTokenObtainPairSerializer
 
 
 @api_view(['GET'])
 def home(request):
-
-    departemants = {}
-    for departemant in Departemant.objects.all():
-        departemants[f"{departemant.name}"] = json.loads(serializers.serialize('json', departemant.courses.filter(
-            status=True).order_by("-credits", "name")))
-
-    print(departemants)
-    notice = request.session.get("notice")
-    departemants["notice"] = notice
+    departemants = {
+        departemant.name: json.loads(serializers.serialize(
+            'json', departemant.courses.filter(status=True).order_by("-credits", "name")))
+        for departemant in Departemant.objects.all()
+    }
+    departemants["notice"] = request.session.get("notice")
     return Response(departemants)
 
 

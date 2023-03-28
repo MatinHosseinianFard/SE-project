@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,7 +26,8 @@ SECRET_KEY = 'django-insecure-7=_)nhle$lpe2*ys&t$ql0n_$2udolnk9e53u#3e!z%sd9b+6a
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1", "chrome-extension://eejfoncpjfgmeleakejdcanedmefagga"]
+ALLOWED_HOSTS = ["127.0.0.1",
+                 "chrome-extension://eejfoncpjfgmeleakejdcanedmefagga"]
 CSRF_TRUSTED_ORIGINS = ['chrome-extension://eejfoncpjfgmeleakejdcanedmefagga']
 
 # Application definition
@@ -37,10 +39,22 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
+    "rest_framework",
+    "rest_framework.authtoken",
+
+    "dj_rest_auth",
+    "django.contrib.sites",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "dj_rest_auth.registration",
+    "corsheaders",
+    "drf_yasg",
+
     'nested_admin',
     'unit_selection',
-    
+
     'accounts',
     'api.apps.ApiConfig',
 ]
@@ -48,16 +62,17 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = "accounts.CustomUser"
 
 MIDDLEWARE = [
-    
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    
-    'unit_selection.middleware.AdminLocaleMiddleware',
+
+    # 'unit_selection.middleware.AdminLocaleMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -114,16 +129,17 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
-LANGUAGES = (
-    ('fa','Persian'),
-    ('en','English'),
-)
 
-DEFAULT_LANGUAGE = 1
+# LANGUAGES = (
+#     ('fa', 'Persian'),
+#     ('en', 'English'),
+# )
 
-LANGUAGE_CODE = 'fa'
+# DEFAULT_LANGUAGE = 1
 
-TIME_ZONE = 'Asia/Tehran'
+# LANGUAGE_CODE = 'fa'
+
+# TIME_ZONE = 'Asia/Tehran'
 
 ADMIN_LANGUAGE_CODE = 'en'
 
@@ -142,14 +158,62 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "home"
 
-GRAPH_MODELS = {
-    "all_applications": True,
-    "graph_models": True
-}
-
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    ]
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        # "dj_rest_auth.jwt_auth.JWTCookieAuthentication",
+        # "rest_framework.authentication.BasicAuthentication",
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'api.permissions.IsStaffOrReadOnly'
+    ],
+
 }
+
+REST_AUTH = {
+    'REGISTER_SERIALIZER': 'api.serializers.CustomRegisterSerializer'
+}
+
+SITE_ID = 1
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+REST_USE_JWT = True
+
+JWT_AUTH_COOKIE = 'access'
+JWT_AUTH_REFRESH_COOKIE = 'refresh'
+
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': False,
+
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': 'settings.SECRET_KEY',
+    'VERIFYING_KEY': None,
+    'AUDIENCE': None,
+    'ISSUER': None,
+
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    "TOKEN_OBTAIN_SERIALIZER": "api.serializers.CustomTokenObtainPairSerializer",
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+
+    'JTI_CLAIM': 'jti',
+
+    'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+}
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8080",
+    "http://127.0.0.1:8080",
+    "chrome-extension://eejfoncpjfgmeleakejdcanedmefagga"
+]
