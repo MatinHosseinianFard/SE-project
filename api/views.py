@@ -8,10 +8,13 @@ from django.core.paginator import Paginator
 from django.shortcuts import render, redirect
 from itertools import permutations
 from rest_framework.decorators import api_view
+from django.http import HttpResponse
+from .serializers import CustomTokenObtainPairSerializer
+from unit_selection.models import Favourite
 
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-)
+
+from rest_framework_simplejwt.views import TokenObtainPairView
+
 
 from unit_selection.models import Departemant, Course, Section
 
@@ -54,7 +57,6 @@ flag = {
     "total_credit": 0,
     "informations": []
 }
-from .serializers import CustomTokenObtainPairSerializer
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -85,13 +87,16 @@ def suggest(request):
         request body:
         {
         "choosed":
-            "['29 122', '16 67', '14 64', '17 68']"
+            {"selected_courses": "29 16 14 17",
+            "selected_sections": "122 67 64 68"
+            }
         }
-        """
+    """
     print(request.data.get("choosed"))
-    if request.POST.getlist("choosed"):
-        choosed = request.POST.getlist("choosed")
-
+    # if request.POST.getlist("choosed"):
+    if request.data.get("choosed"):
+        # choosed = request.POST.getlist("choosed")
+        choosed = request.data.get("choosed")
         request.session["choosed"] = choosed
         tables = None
     else:
@@ -100,13 +105,13 @@ def suggest(request):
             return redirect("home")
         if tables in (None, 'None', ''):
             tables = None
-
+    print(choosed["selected_courses"])
     if tables in (None, 'None', ''):
-        def get_courses_pk(item): return int(item.split(" ")[0])
-        def get_sections_pk(item): return int(item.split(" ")[1])
+        # def get_courses_pk(item): return int(item.split(" "))
+        # def get_sections_pk(item): return int(item.split(" "))
 
-        selected_courses = {get_courses_pk(i) for i in choosed}
-        selected_sections = [get_sections_pk(i) for i in choosed]
+        selected_courses = {int(i) for i in choosed["selected_courses"].split(" ")}
+        selected_sections = [int(i) for i in choosed["selected_sections"].split(" ")]
 
         courses_name = Course.objects.filter(pk__in=selected_courses)
         min_credit = 0
@@ -259,3 +264,18 @@ def suggest(request):
             message = "برنامه ای با این دروس و تعداد واحد مدنظر وجود ندارد"
     tables.append({"message": message})
     return Response(tables)
+
+@api_view(['GET', 'POST'])
+def addFavourite(request):
+    if request.method == 'POST':
+        courses_pk = request.data.get("selected_courses")
+        sections_pk = request.data.get("selected_sections")
+        obj = list(Favourite.objects.filter(owner=request.user,
+                   courses_pk=courses_pk, sections_pk=sections_pk))
+        if len(obj) == 0:
+            Favourite.objects.create(
+                owner=request.user, courses_pk=courses_pk, sections_pk=sections_pk)
+
+        return HttpResponse(status=200)
+
+    return HttpResponse(status=400)

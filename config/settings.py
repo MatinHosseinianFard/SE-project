@@ -141,7 +141,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # TIME_ZONE = 'Asia/Tehran'
 
-ADMIN_LANGUAGE_CODE = 'en'
+# ADMIN_LANGUAGE_CODE = 'en'
 
 
 # Static files (CSS, JavaScript, Images)
@@ -162,7 +162,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         # "dj_rest_auth.jwt_auth.JWTCookieAuthentication",
-        # "rest_framework.authentication.BasicAuthentication",
+        "rest_framework.authentication.BasicAuthentication",
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'api.permissions.IsStaffOrReadOnly'
@@ -185,7 +185,7 @@ JWT_AUTH_REFRESH_COOKIE = 'refresh'
 
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=50),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -208,7 +208,7 @@ SIMPLE_JWT = {
     'JTI_CLAIM': 'jti',
 
     'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
-    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=50),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
