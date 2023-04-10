@@ -110,8 +110,10 @@ def suggest(request):
         # def get_courses_pk(item): return int(item.split(" "))
         # def get_sections_pk(item): return int(item.split(" "))
 
-        selected_courses = {int(i) for i in choosed["selected_courses"].split(" ")}
-        selected_sections = [int(i) for i in choosed["selected_sections"].split(" ")]
+        selected_courses = {int(i)
+                            for i in choosed["selected_courses"].split(" ")}
+        selected_sections = [int(i)
+                             for i in choosed["selected_sections"].split(" ")]
 
         courses_name = Course.objects.filter(pk__in=selected_courses)
         min_credit = 0
@@ -262,11 +264,19 @@ def suggest(request):
             message = "برنامه ای با این دروس امکان پذیر نیست"
         else:
             message = "برنامه ای با این دروس و تعداد واحد مدنظر وجود ندارد"
-    tables.append({"message": message})
+    tables.append({"message": message, "search": search})
     return Response(tables)
 
-@api_view(['GET', 'POST'])
+
+@api_view(['POST'])
 def addFavourite(request):
+    """
+    request body:
+    {
+        "selected_courses": "29 16 14 17",
+        "selected_sections": "122 67 64 68"
+    }
+    """
     if request.method == 'POST':
         courses_pk = request.data.get("selected_courses")
         sections_pk = request.data.get("selected_sections")
@@ -279,3 +289,144 @@ def addFavourite(request):
         return HttpResponse(status=200)
 
     return HttpResponse(status=400)
+
+
+@api_view(['GET'])
+def seeFavourite(request):
+    favourites = Favourite.objects.filter(owner=request.user)
+    error = False
+    tables = []
+
+    for fav in favourites:
+
+        favourite_courses_pk = [int(pk) for pk in fav.courses_pk.split(" ")]
+        favourite_sections_pk = [int(pk) for pk in fav.sections_pk.split(" ")]
+
+        courses_name = Course.objects.filter(pk__in=favourite_courses_pk)
+        sections = []
+        tot_credits = 0
+
+        if len(favourite_courses_pk) != len(list(courses_name)):
+            Favourite.objects.filter(owner=request.user, pk=fav.pk).delete()
+            error = True
+            continue
+
+        for course in courses_name:
+            course_sections = Section.objects.filter(
+                course=course, pk__in=favourite_sections_pk)
+
+            if len(list(course_sections)) != 1:
+                Favourite.objects.filter(
+                    owner=request.user, pk=fav.pk).delete()
+                error = True
+                break
+
+            course_sections_info = []
+            tot_credits += course.credits
+
+            for section in course_sections:
+                section_info = {
+                    "name": str(course.name),
+                    "instructor": section.instructor.name,
+                    "credit": course.credits,
+                    "code": section.code,
+                    "gender": section.gender,
+                    "exam_date": course.exam_date,
+                    "exam_time": course.exam_time,
+                    "time": [
+                        f"{time.day} {time.start}-{time.end}" for time in section.times.all()],
+                    "course_pk": course.pk,
+                    "section_pk": section.pk
+                }
+                course_sections_info.append(section_info)
+
+            sections.append(course_sections_info)
+
+        if error:
+            continue
+
+        state = [[1] for _ in range(len(favourite_sections_pk))]
+
+        copy_flag = deepcopy(flag)
+        informations = []
+        possiblie = True
+
+        for i, element in enumerate(state):
+
+            section = sections[i][0]
+            times = section["time"]
+
+            for time in times:
+                day, section_time = time.split(" ")
+                if not copy_flag[day][section_time]:
+                    copy_flag[day][section_time] = "{}".format(
+                        section["name"] if len(section["name"]) <= 30 else section["name"][:30]+"..")
+                else:
+                    possiblie = False
+                    break
+
+            if not possiblie:
+                break
+
+            informations.append(
+                {
+                    "name": section["name"],
+                    "instructor": section["instructor"],
+                    "code": section["code"],
+                    "group": section["code"][-2:],
+                    "gender": section["gender"],
+                    "credit": section["credit"],
+                    "exam_date": section["exam_date"],
+                    "exam_time": section["exam_time"],
+                    "course_pk": section["course_pk"],
+                    "section_pk": section["section_pk"],
+                    "exam_conflict": False
+                },
+            )
+
+        if not possiblie:
+            error = True
+            Favourite.objects.filter(owner=request.user, pk=fav.pk).delete()
+            continue
+
+        informations.sort(
+            key=lambda item: item["exam_date"], reverse=False)
+
+        for i in range(len(informations)-1):
+            if informations[i]["exam_date"] == "0":
+                continue
+            if informations[i]["exam_date"] == informations[i+1]["exam_date"]:
+                informations[i]["exam_conflict"] = True
+                informations[i+1]["exam_conflict"] = True
+
+        copy_flag["total_credit"] = tot_credits
+        copy_flag["informations"] = informations
+        copy_flag["favourite_pk"] = fav.pk
+
+        tables.append(copy_flag)
+
+        tables = sorted(
+            tables, key=lambda item: item["total_credit"], reverse=True)
+
+    if len(tables) == 0:
+        notice = True
+    else:
+        notice = False
+
+    tables.append({"notice": notice, "error": error})
+    return Response(tables)
+
+
+@api_view(['POST'])
+def removeFavourite(request):
+    """
+    request body:
+    {
+        "favourite_pk": "39"
+    }
+    """
+    if request.method == 'POST':
+        pk = int(request.data.get("favourite_pk"))
+        Favourite.objects.filter(pk=pk).delete()
+        return HttpResponse(status=204)
+    return HttpResponse(status=201)
