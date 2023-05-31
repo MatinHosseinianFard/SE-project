@@ -77,9 +77,10 @@ def Suggest(request):
     search = request.GET.get("search")
     if search not in (None, 'None', '') and not search.isdigit():
         search = None
-
+        
+    print("search", search)
     tables = request.session.get("tables")
-
+    print("tables", tables)
     if request.POST.getlist("choosed"):
         choosed = request.POST.getlist("choosed")
         request.session["choosed"] = choosed
@@ -225,13 +226,12 @@ def Suggest(request):
                     informations[i+1]["exam_conflict"] = True
 
             if possiblie and total_credit >= 12:
+                copy_flag["total_credit"] = total_credit
                 if search not in (None, 'None', ''):
                     if total_credit == int(search):
-                        copy_flag["total_credit"] = total_credit
                         copy_flag["informations"] = informations
                         tables.append(copy_flag)
                 else:
-                    copy_flag["total_credit"] = total_credit
                     copy_flag["informations"] = informations
 
                     tables.append(copy_flag)
@@ -251,16 +251,22 @@ def Suggest(request):
             message = "برنامه ای با این دروس امکان پذیر نیست"
         else:
             message = "برنامه ای با این دروس و تعداد واحد مدنظر وجود ندارد"
+    
+    print("len : ", len(tables))
 
+    for x in tables:
+        print("x :", x)
+        print()
+    
     paginator = Paginator(tables, 1)
     page_number = request.GET.get('page')
     tables = paginator.get_page(page_number)
-
     return render(request, "suggest.html", {
-        "tables": tables,
         "search": search,
+        "tables": tables,
         "message": message
     })
+
 
 
 @login_required(login_url='/accounts/login/')
