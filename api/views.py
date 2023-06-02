@@ -313,7 +313,7 @@ def addFavourite(request):
             Favourite.objects.create(
                 owner=request.user, courses_pk=courses_pk, sections_pk=sections_pk)
 
-        return HttpResponse("Successfully removed", status=201)
+        return HttpResponse("Successfully added", status=201)
 
     return HttpResponse("The method should be POST", status=400)
 
