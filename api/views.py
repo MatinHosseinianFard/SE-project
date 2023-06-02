@@ -5,7 +5,8 @@ from itertools import permutations
 from rest_framework.decorators import api_view
 from django.http import HttpResponse
 from .serializers import CustomTokenObtainPairSerializer
-
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 from rest_framework_simplejwt.views import TokenObtainPairView
 
@@ -319,6 +320,7 @@ def addFavourite(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def seeFavourite(request):
     favourites = Favourite.objects.filter(owner=request.user)
     error = False
