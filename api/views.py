@@ -1,11 +1,6 @@
-from . import serializers
-import json
-from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.core import serializers
 from copy import deepcopy
-from django.core.paginator import Paginator
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from itertools import permutations
 from rest_framework.decorators import api_view
 from django.http import HttpResponse
@@ -92,7 +87,7 @@ def home(request):
                     })
     
     response["notice"] = request.session.get("notice")
-    return Response(response)
+    return Response(response, status=200)
 
 
 @api_view(['GET', 'POST'])
@@ -111,20 +106,13 @@ def suggest(request):
                     }
                 }
             """
-            print(request.data.get("choosed"))
-            # if request.POST.getlist("choosed"):
             if request.data.get("choosed"):
-                # choosed = request.POST.getlist("choosed")
                 choosed = request.data.get("choosed")
                 request.session["choosed"] = choosed
                 tables = None
             else:
                 return HttpResponse("error")
-            
-            print(choosed["selected_courses"])
-            
-            # def get_courses_pk(item): return int(item.split(" "))
-            # def get_sections_pk(item): return int(item.split(" "))
+    
 
             selected_courses = {int(i)
                                 for i in choosed["selected_courses"].split(" ")}
@@ -269,17 +257,15 @@ def suggest(request):
                 tables, key=lambda item: item["total_credit"], reverse=True)
             
             request.session["tables"] = tables
-
-            print(tables)
             
             message = False
             
             if len(tables) == 0:
                 message = "برنامه ای با این دروس و تعداد واحد مدنظر وجود ندارد"
             
-            tables.append({"message": message, "search": None})
+            tables.append({"message": message, "search": search})
             
-            return Response(tables)
+            return Response(tables, status=200)
     
     
     if request.method == 'GET':
@@ -295,8 +281,6 @@ def suggest(request):
         elif search not in (None, 'None', ''):
             tables = list(
                 filter(lambda item: item["total_credit"] == int(search), tables))
-        
-        print(tables)
         
         message = False
         
@@ -329,9 +313,9 @@ def addFavourite(request):
             Favourite.objects.create(
                 owner=request.user, courses_pk=courses_pk, sections_pk=sections_pk)
 
-        return HttpResponse(status=200)
+        return HttpResponse("Successfully removed", status=201)
 
-    return HttpResponse(status=400)
+    return HttpResponse("The method should be POST", status=400)
 
 
 @api_view(['GET'])
