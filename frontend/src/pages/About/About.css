@@ -1,0 +1,90 @@
+.matin {
+  background-color: #eeeeee;
+}
+
+.contact-container {
+  /* max-width: 1000px; */
+  /* font-size: xx-small; */
+  margin: 5rem auto;
+  /* overflow: auto; */
+  /* padding: 0 40px; */
+}
+
+.contact-flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  font-family: Tanha;
+}
+
+.contact-flex {
+  flex-direction: column;
+  height: auto;
+}
+#email a {
+  transition: all 0.1s ease;
+}
+#telegram a {
+  transition: all 0.1s ease;
+}
+#email a:hover {
+  color: #e34133;
+}
+#telegram a:hover {
+  color: #33a6e1;
+}
+.matin {
+  padding: 20px;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px,
+    rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px,
+    rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+
+  border-radius: 20px;
+
+}
+
+img {
+  width: 100%;
+  height: auto;
+  max-width: 200px;
+  max-height: 200px;
+  text-align: center;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.contact-grid {
+  grid-template-columns: 1fr;
+  align-items: center;
+  width: 50%;
+}
+a {
+  text-decoration: none;
+  color: #333;
+}
+
+@media (max-width: 500px){
+.contact-grid {
+    grid-template-columns: 1fr;
+    align-items: center;
+    /* width: auto;
+    font-size: small;
+    gap: 0; */
+}
+}

@@ -95,6 +95,9 @@ def home(request):
 def suggest(request):
 
     if request.method == 'POST':
+            notice = False
+            impossible = False 
+            message = False
             search = request.GET.get("search")
             if search not in (None, 'None', '') and not search.isdigit():
                 search = None
@@ -113,12 +116,19 @@ def suggest(request):
                 tables = None
             else:
                 return HttpResponse("error")
-    
+            print(choosed)
 
-            selected_courses = {int(i)
-                                for i in choosed["selected_courses"].split(" ")}
-            selected_sections = [int(i)
-                                for i in choosed["selected_sections"].split(" ")]
+            if choosed["selected_courses"] != '':
+                selected_courses = {int(i)
+                                    for i in choosed["selected_courses"].split(" ")}
+            else:
+                selected_courses = {}
+
+            if choosed["selected_sections"] != '':
+                selected_sections = [int(i)
+                                    for i in choosed["selected_sections"].split(" ")]
+            else:
+                selected_sections = []
 
             courses_name = Course.objects.filter(pk__in=selected_courses)
             min_credit = 0
@@ -148,7 +158,9 @@ def suggest(request):
 
             if min_credit < 12:
                 request.session["notice"] = True
-                return redirect("home")
+                notice = True
+                message = "حداقل 12 واحد انتخاب کنید"
+                return Response([{"message": message, "search": search, "notice": notice, "impossible": impossible}])
             else:
                 request.session["notice"] = False
 
@@ -242,7 +254,7 @@ def suggest(request):
                         informations[i]["exam_conflict"] = True
                         informations[i+1]["exam_conflict"] = True
 
-                if possiblie and total_credit >= 12:
+                if possiblie and 24 >= total_credit >= 12 :
                     if search not in (None, 'None', ''):
                         if total_credit == int(search):
                             copy_flag["total_credit"] = total_credit
@@ -258,13 +270,11 @@ def suggest(request):
                 tables, key=lambda item: item["total_credit"], reverse=True)
             
             request.session["tables"] = tables
-            
-            message = False
-            
+                        
             if len(tables) == 0:
-                message = "برنامه ای با این دروس و تعداد واحد مدنظر وجود ندارد"
-            
-            tables.append({"message": message, "search": search})
+                message = "برنامه ای با این دروس امکان پذیر نیست"
+                impossible = True
+            tables.append({"message": message, "search": search, "notice": notice, "impossible": impossible})
             
             return Response(tables, status=200)
     
@@ -291,7 +301,7 @@ def suggest(request):
             else:
                 message = "برنامه ای با این دروس و تعداد واحد مدنظر وجود ندارد"
         tables.pop()
-        tables.append({"message": message, "search": search})
+        tables.append({"message": message, "search": search, "notice": notice})
         return Response(tables)
     
 

@@ -72,7 +72,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
-    # 'unit_selection.middleware.AdminLocaleMiddleware',
+    'unit_selection.middleware.AdminLocaleMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -130,18 +130,18 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
 
-# LANGUAGES = (
-#     ('fa', 'Persian'),
-#     ('en', 'English'),
-# )
+LANGUAGES = (
+    ('fa', 'Persian'),
+    ('en', 'English'),
+)
 
-# DEFAULT_LANGUAGE = 1
+DEFAULT_LANGUAGE = 1
 
-# LANGUAGE_CODE = 'fa'
+LANGUAGE_CODE = 'fa'
 
-# TIME_ZONE = 'Asia/Tehran'
+TIME_ZONE = 'Asia/Tehran'
 
-# ADMIN_LANGUAGE_CODE = 'en'
+ADMIN_LANGUAGE_CODE = 'en'
 
 
 # Static files (CSS, JavaScript, Images)
@@ -185,8 +185,8 @@ JWT_AUTH_REFRESH_COOKIE = 'refresh'
 
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=50),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
+    'REFRESH_TOKEN_LIFETIME': timedelta(hours=1),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': False,
@@ -208,12 +208,14 @@ SIMPLE_JWT = {
     'JTI_CLAIM': 'jti',
 
     'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
-    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=50),
-    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=10),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(hours=1),
 }
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8080",
+    "http://localhost:3000",
     "http://127.0.0.1:8080",
+    "http://127.0.0.1:3000",
     "chrome-extension://eejfoncpjfgmeleakejdcanedmefagga"
 ]

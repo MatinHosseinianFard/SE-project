@@ -161,22 +161,22 @@
         {% endfor %}        
         <br>
         <div class="container">
-        <form method="POST" id="add-favourite">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-primary">افرودن به علاقه مندی ها</button>
-        </form>
-        <br>
+          <form method="POST" id="add-favourite">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-primary">افرودن به علاقه مندی ها</button>
+          </form>
+          <br>
           <nav aria-label="Page navigation example">
             <ul class="pagination">
               {% if tables.has_previous %}
-              <li class="page-item"><a class="page-link" href="/suggest/?page={{ tables.previous_page_number }}&search={{ search }}">قبلی</a></li>
+                <li class="page-item"><a class="page-link" href="/suggest/?page={{ tables.previous_page_number }}&search={{ search }}">قبلی</a></li>
               {% endif %}
               <li class="page-item"><a class="page-link" href="#"><span class="page-current">
                 صفحه {{ tables.number }} از {{ tables.paginator.num_pages }}
-            </span></a></li>
-            {% if tables.has_next %}
-            <li class="page-item"><a class="page-link" href="/suggest/?page={{ tables.next_page_number }}&search={{ search }}">بعدی</a></li>
-            {% endif %}
+              </span></a></li>
+              {% if tables.has_next %}
+                <li class="page-item"><a class="page-link" href="/suggest/?page={{ tables.next_page_number }}&search={{ search }}">بعدی</a></li>
+              {% endif %}
             </ul>
           </nav>
         </div>
