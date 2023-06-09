@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 
 import Container from "../Container/Container.js";
 
-import { logout, setTables } from '../../store/store.js';
+import { logout, setTables, setPathName } from '../../store/store.js';
 
 const Header = () => {
   const isAuthenticated = useSelector(state => state.isAuthenticated);
@@ -13,7 +13,7 @@ const Header = () => {
   const user_first_name = useSelector(state => state.user_first_name);
   const user_last_name = useSelector(state => state.user_last_name);
   const [showSearchBar, setShowSearchBar] = useState(false);
-  const [pathname, setPathname] = useState(window.location.pathname);
+  const pathname = useSelector(state => state.pathname);
 
   const inputRef = useRef();
 
@@ -49,7 +49,7 @@ const Header = () => {
   }
   
   const pathhandler = () => {
-    setPathname(window.location.pathname); 
+    dispatch(setPathName(window.location.pathname)); 
   }
 
   return (

@@ -29,6 +29,7 @@ const Favourite = () => {
     axios
       .get("/api/see-favourite")
       .then((response) => {
+        console.log(response);
         let data = response.data;
         const info = data.pop(); 
         setError(info.error);
@@ -61,6 +62,7 @@ const Favourite = () => {
     axios
         .post('/api/remove-favourite/', query)
         .then(response => {
+          console.log(response)
            setDeleteEvent(true);        
         })
         .catch(error => {
@@ -92,8 +94,8 @@ const Favourite = () => {
                   <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
                 </symbol>
               </svg>
-              <div class="alert alert-danger d-flex align-items-center" role="alert">
-                <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use href="#exclamation-triangle-fill"/></svg>
+              <div className="alert alert-danger d-flex align-items-center" role="alert">
+                <svg className="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use href="#exclamation-triangle-fill"/></svg>
                 <div>
                   برنامه هایی که درس های آن دچار تغییر شدند از علاقه مندی حذف می شوند. 
                 </div>
@@ -237,7 +239,7 @@ const Favourite = () => {
                                   {section.exam_date !== "0" ? (
                                   !section.exam_conflict ? (<td className="text-center">{section.exam_date} | {section.exam_time}</td>) 
                                   : (<td className="text-center text-danger">{section.exam_date} | {section.exam_time}</td>)
-                                  ) : <td class="text-center">ندارد</td> }
+                                  ) : <td className="text-center">ندارد</td> }
 
                                 <td className="text-center">{section.instructor}</td>
                                 <td className="text-center">{section.gender}</td>

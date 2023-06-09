@@ -8,7 +8,7 @@ import { useNavigate } from "react-router";
 
 import axios from "../../axios.js";
 
-import { logout, setSuggestions, setTables } from "../../store/store.js";
+import { logout, setSuggestions, setTables, setPathName } from "../../store/store.js";
 
 const Home = () => {
   const accordionNumber = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
@@ -72,6 +72,7 @@ const Home = () => {
     axios
         .post('/api/suggest/', query)
         .then(response => {
+            distpatch(setPathName("/suggest"));
             setOpen(false);
             if (response.data.length === 1 && response.data[0].notice) {
                 setNotice(true);

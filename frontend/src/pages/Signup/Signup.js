@@ -98,7 +98,13 @@ const Signup = () => {
     }
 
     if (access) {
-
+        // console.log({
+        //   username: username,
+        //   password1: password1,
+        //   password2: password2,
+        //   first_name: firstName,
+        //   last_name: lastName
+        // })
         axios
         .post('/api/dj-rest-auth/registration/', {
           username: username,
@@ -108,6 +114,7 @@ const Signup = () => {
           last_name: lastName
         })
         .then(response => {
+          alert("با موفقیت انجام شد.")
           navigate("/")
         })
         .catch(error => {
@@ -118,20 +125,25 @@ const Signup = () => {
           }
           else if (error.response.data.password1) {
             setPassword1Error(true);
-            setPassword1ErrorMessage(error.response.data.password.join(" "));
+            setPassword1ErrorMessage(error.response.data.password1.join(" "));
           }
           else if (error.response.data.password2) {
             setPassword2Error(true);
-            setPassword2ErrorMessage(error.response.data.password.join(" "));
+            setPassword2ErrorMessage(error.response.data.password2.join(" "));
           }
           else if (error.response.data.first_name) {
             setFirstNameError(true);
-            setFirstNameErrorMessage(error.response.data.password.join(" "));
+            setFirstNameErrorMessage(error.response.data.first_name.join(" "));
           }
           else if (error.response.data.last_name) {
             setLastNameError(true);
-            setLastNameErrorMessage(error.response.data.password.join(" "));
+            setLastNameErrorMessage(error.response.data.last_name.join(" "));
           }
+          else if (error.response.data.non_field_errors) {
+            setPassword1Error(true);
+            setPassword1ErrorMessage(error.response.data.non_field_errors.join(" "));
+          }
+          navigate("/signup")
         });
     }
 

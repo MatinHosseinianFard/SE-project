@@ -7,6 +7,7 @@ import thunk from "redux-thunk";
 const initialState = {
   suggestions: [],
   in_suggest: false,
+  pathname: "/",
   tables: [],
   search_value: "",
   isAuthenticated: false,
@@ -25,6 +26,7 @@ const SET_SUGGESTIONS = "SET_SUGGESTIONS";
 const SET_SEARCH_VALUE = "SET_SEARCH_VALUE";
 const SET_TABLES = "SET_TABLES";
 const SET_IN_SUGGEST = "SET_IN_SUGGEST";
+const SET_PATHNAME = "SET_PATHNAME";
 
 // Define action creators
 export const login = (token, refresh) => ({
@@ -59,6 +61,11 @@ export const setTables = (tables) => ({
 export const setInSuggest = (in_suggest) => ({
   type: SET_IN_SUGGEST,
   payload: in_suggest,
+});
+
+export const setPathName = (pathname) => ({
+  type: SET_PATHNAME,
+  payload: pathname,
 });
 
 // Define reducers
@@ -128,6 +135,13 @@ const rootReducer = (state = initialState, action) => {
       return {
         ...state,
         in_suggest
+      };
+      
+      case SET_PATHNAME:
+        const pathname = action.payload;
+      return {
+        ...state,
+        pathname
       };
     default:
       return state;

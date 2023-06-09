@@ -60,6 +60,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def home(request):
     
     response = {}
@@ -92,6 +93,7 @@ def home(request):
 
 
 @api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
 def suggest(request):
 
     if request.method == 'POST':
@@ -307,6 +309,7 @@ def suggest(request):
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def addFavourite(request):
     """
     request body:
@@ -457,6 +460,7 @@ def seeFavourite(request):
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def removeFavourite(request):
     """
     request body:
