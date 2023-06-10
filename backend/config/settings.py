@@ -27,7 +27,9 @@ SECRET_KEY = 'django-insecure-7=_)nhle$lpe2*ys&t$ql0n_$2udolnk9e53u#3e!z%sd9b+6a
 DEBUG = True
 
 ALLOWED_HOSTS = ["127.0.0.1",
+                 "0.0.0.0",
                  "chrome-extension://eejfoncpjfgmeleakejdcanedmefagga"]
+
 CSRF_TRUSTED_ORIGINS = ['chrome-extension://eejfoncpjfgmeleakejdcanedmefagga']
 
 # Application definition
@@ -214,8 +216,10 @@ SIMPLE_JWT = {
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8080",
+    "http://localhost:8000",
     "http://localhost:3000",
     "http://127.0.0.1:8080",
+    "http://0.0.0.0:8000",
     "http://127.0.0.1:3000",
     "chrome-extension://eejfoncpjfgmeleakejdcanedmefagga"
 ]
