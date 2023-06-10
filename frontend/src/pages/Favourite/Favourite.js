@@ -4,6 +4,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import Container from "../../containers/Container/Container.js";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router";
 import axios from "../../axios.js";
 
 import { logout } from "../../store/store.js";
@@ -18,8 +19,8 @@ const Favourite = () => {
   const [currentTable, setCurrentTable] = useState(false);
   const [tables, setTables] = useState(false);
   
-
-  const distpatch = useDispatch()
+  const navigate = useNavigate();
+  const distpatch = useDispatch();
 
   useEffect(() => {
     document.title = 'علاقه مندی ها';
@@ -29,18 +30,20 @@ const Favourite = () => {
     axios
       .get("/api/see-favourite")
       .then((response) => {
-        console.log(response);
+        // console.log(response);
         let data = response.data;
         const info = data.pop(); 
         setError(info.error);
         setIsEmpty(info.notice);
         setTables(response.data);
-        setDeleteEvent(false)
       })
       .catch((error) => {
         console.error("خطا در دریافت اطلاعات:", error);
-        distpatch(logout())
+        distpatch(logout());
+        navigate("/");
       });
+
+      // return setDeleteEvent(false);
   }, [deleteEvent]);
 
   
@@ -63,11 +66,12 @@ const Favourite = () => {
         .post('/api/remove-favourite/', query)
         .then(response => {
           console.log(response)
-           setDeleteEvent(true);        
+           setDeleteEvent(!deleteEvent);        
         })
         .catch(error => {
-          console.log(error)
-          distpatch(logout())
+          console.log(error);
+          distpatch(logout());
+          navigate("/");
         })  
   };
   
@@ -83,7 +87,7 @@ const Favourite = () => {
             sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
             open={open}          >
             <CircularProgress color="inherit" />
-          </Backdrop>
+      </Backdrop>
       {currentTable && !isEmpty ? (
         <div className="container">
           {error ? (
@@ -297,7 +301,7 @@ const Favourite = () => {
           <div className="alert alert-warning d-flex align-items-center" role="alert">
             <svg className="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use href="#exclamation-triangle-fill"/></svg>
             <div>
-              علاقه مندی وجود ندارد
+              علاقه مندی وجود ندارد.
             </div>
           </div>
           </div>

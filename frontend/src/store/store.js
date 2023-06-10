@@ -83,6 +83,7 @@ const rootReducer = (state = initialState, action) => {
         refresh,
       };
     case LOGOUT:
+      
       localStorage.removeItem("token");
       localStorage.removeItem("refresh");
       axios.defaults.headers.common["Authorization"] = "";

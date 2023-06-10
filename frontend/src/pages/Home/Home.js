@@ -35,7 +35,8 @@ const Home = () => {
       })
       .catch((error) => {
         console.error("خطا در دریافت اطلاعات:", error);
-        distpatch(logout())
+        distpatch(logout());
+        navigate("/");
       });
   }, []);
 
@@ -89,8 +90,9 @@ const Home = () => {
             }
         })
         .catch(error => {
-          console.log(error)
-          distpatch(logout())
+          console.log(error);
+          distpatch(logout());
+          navigate("/")
         })
   }
   

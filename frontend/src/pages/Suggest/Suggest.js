@@ -19,6 +19,7 @@ const Suggest = () => {
   
   const tables = useSelector(state => state.tables);
 
+  const navigate = useNavigate();
   const distpatch = useDispatch()
   
   useEffect(() => {
@@ -56,8 +57,9 @@ const Suggest = () => {
            setMessage(true);    
         })
         .catch(error => {
-          console.log(error)
-          distpatch(logout())
+          console.log(error);
+          distpatch(logout());
+          navigate("/");
         })  
   };
   
@@ -73,7 +75,7 @@ const Suggest = () => {
           {message ? (
             <Container>
               <br/>
-              <div class="alert alert-success d-flex align-items-center" role="alert">
+              <div className="alert alert-success d-flex align-items-center" role="alert">
                 <div>
                 <TiTick className="icon" /> افزوده شد.
                 </div>
