@@ -67,7 +67,7 @@ def home(request):
     
     for department in Departemant.objects.all():
         response[department.name] = {}
-        for course in department.courses.all():
+        for course in department.courses.filter(status=True):
             sections = Section.objects.filter(course=course)
             response[department.name][str(course)] = {}
             response[department.name][str(course)]["sections"] = []
