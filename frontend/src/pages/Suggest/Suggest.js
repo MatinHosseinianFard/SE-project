@@ -141,9 +141,9 @@ const Suggest = () => {
                       })}
                     </tr>
                     <tr>
-                      <th scope="row">سشنبه</th>
+                      <th scope="row">سه‌شنبه</th>
                       {Object.keys(currentTable).map(day => {
-                        if (day === "سشنبه") {
+                        if (day === "سه‌شنبه") {
                           return (
                             Object.keys(currentTable[day]).map((time) => {
                               return <td className="text-center">{currentTable[day][time]}</td>
