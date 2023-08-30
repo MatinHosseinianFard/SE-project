@@ -117,7 +117,7 @@ const Home = () => {
             <div className="alert alert-primary d-flex align-items-center" role="alert">
                 <svg className="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:"><use href="#info-fill"/></svg>
                 <div>
-                این دروس مربوط به ترم 4012 است. برای اضافه یا تصحیح درس به آدرس تلگرام قرار داده شده در قسمت درباره ما پیام دهید.
+                این دروس مربوط به ترم 4021 است. برای اضافه یا تصحیح درس به آدرس تلگرام قرار داده شده در قسمت درباره ما پیام دهید.
                 </div>
             </div>
             
