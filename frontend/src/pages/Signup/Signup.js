@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import Backdrop from '@mui/material/Backdrop';
 
 import { Link } from 'react-router-dom';
 
@@ -9,7 +8,6 @@ import { useNavigate } from 'react-router-dom';
 import "./Signup.css";
 
 const Signup = () => {
-  const [open, setOpen] = useState(false);
 
   const [username, setUsername] = useState("");
   const [usernameError, setUsernameError] = useState(false);
@@ -101,7 +99,6 @@ const Signup = () => {
     }
 
     if (access) {
-        setOpen(true);
         axios
         .post('/api/dj-rest-auth/registration/', {
           username: username,
@@ -111,12 +108,10 @@ const Signup = () => {
           last_name: lastName
         })
         .then(response => {
-          setOpen(false)
           alert("با موفقیت انجام شد.")
           navigate("/")
         })
         .catch(error => {
-          setOpen(false);
           console.log(error.response.data);
           if (error.response.data.username) {
             setUsernameError(true);
