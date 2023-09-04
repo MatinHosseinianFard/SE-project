@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import { Analytics } from '@vercel/analytics/react';
+import { inject } from '@vercel/analytics';
 
 import { onStart } from "./store/store.js";
 
@@ -21,14 +21,13 @@ import About from "./pages/About/About.js";
 const App = () => {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(state => state.isAuthenticated);
-  
+  inject();
   useEffect(() => {
     dispatch(onStart());
   });
 
   return (
     <Container>
-      <Analytics />
       <Router>
         {!isAuthenticated ? (
           <Routes>
