@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
+import { Analytics } from '@vercel/analytics/react';
 
 import { onStart } from "./store/store.js";
 
@@ -27,6 +28,7 @@ const App = () => {
 
   return (
     <Container>
+      <Analytics />
       <Router>
         {!isAuthenticated ? (
           <Routes>
