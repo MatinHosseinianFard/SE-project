@@ -60,22 +60,25 @@ const Favourite = () => {
   };
 
   const removeFavouriteHandler = (event) => {
+    setOpen(true);
     event.preventDefault();
     let query = {
       favourite_pk: currentTable.favourite_pk
   }
-  setOpen(true)
-  setInterval(() => {
-    setOpen(false)
-  }, 200);
+  // setOpen(true)
+  // setInterval(() => {
+  //   setOpen(false)
+  // }, 200);
     axios
         .post('/api/remove-favourite/', query)
         .then(response => {
+          setOpen(false);
           console.log(response)
            setDeleteEvent(!deleteEvent);
            showToastMessage();
         })
         .catch(error => {
+          setOpen(false);
           console.log(error);
           distpatch(logout());
           navigate("/");
@@ -91,11 +94,11 @@ const Favourite = () => {
   return (
     <Container>
       <ToastContainer autoClose={1000} rtl="rtl"/>
-      {/* <Backdrop
+      <Backdrop
             sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
             open={open}          >
             <CircularProgress color="inherit" />
-      </Backdrop> */}
+      </Backdrop>
       {currentTable && !isEmpty ? (
         <div className="container">
           {error ? (

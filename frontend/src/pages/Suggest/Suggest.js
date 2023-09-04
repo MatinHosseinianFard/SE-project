@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { TiTick } from 'react-icons/ti';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -13,6 +15,7 @@ import Container from "../../containers/Container/Container.js";
 import { logout } from "../../store/store.js";
 
 const Suggest = () => {
+  const [open, setOpen] = useState(false);
 
   // const [message, setMessage] = useState(false);
   const [possible, setPossible] = useState(true);
@@ -47,6 +50,7 @@ const Suggest = () => {
   };
 
   const addFavouriteHandler = (event) => {
+    setOpen(true);
     event.preventDefault();
     let query = {
       selected_courses: "",
@@ -63,9 +67,11 @@ const Suggest = () => {
     axios
         .post('/api/add-favourite/', query)
         .then(response => {
-           showToastMessage();   
+          setOpen(false);
+           showToastMessage();
         })
         .catch(error => {
+          setOpen(false);
           console.log(error);
           distpatch(logout());
           navigate("/");
@@ -79,6 +85,11 @@ const Suggest = () => {
 
   return (
     <Container>
+      <Backdrop
+            sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={open}          >
+            <CircularProgress color="inherit" />
+      </Backdrop>
       <ToastContainer autoClose={1000} rtl="rtl"/>
       {currentTable ? (
         <div className="container">          
