@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-import Container from "../../containers/Container/Container.js";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
-import axios from "../../axios.js";
 
+import axios from "../../axios.js";
+import Container from "../../containers/Container/Container.js";
 import { logout } from "../../store/store.js";
 
 const Favourite = () => {
@@ -51,7 +53,11 @@ const Favourite = () => {
     setCurrentTable(tables[currentPage-1]);
   }, [currentPage, tables]);
   
-
+  const showToastMessage = () => {
+    toast.error('حذف شد.', {
+        position: toast.POSITION.TOP_RIGHT
+    });
+  };
 
   const removeFavouriteHandler = (event) => {
     event.preventDefault();
@@ -66,7 +72,8 @@ const Favourite = () => {
         .post('/api/remove-favourite/', query)
         .then(response => {
           console.log(response)
-           setDeleteEvent(!deleteEvent);        
+           setDeleteEvent(!deleteEvent);
+           showToastMessage();
         })
         .catch(error => {
           console.log(error);
@@ -83,11 +90,12 @@ const Favourite = () => {
 
   return (
     <Container>
-      <Backdrop
+      <ToastContainer autoClose={1000} rtl="rtl"/>
+      {/* <Backdrop
             sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
             open={open}          >
             <CircularProgress color="inherit" />
-      </Backdrop>
+      </Backdrop> */}
       {currentTable && !isEmpty ? (
         <div className="container">
           {error ? (

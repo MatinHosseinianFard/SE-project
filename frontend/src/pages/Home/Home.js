@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import Container from "../../containers/Container/Container.js";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 
 import axios from "../../axios.js";
+import Container from "../../containers/Container/Container.js";
 
 import { logout, setSuggestions, setTables, setPathName } from "../../store/store.js";
 
@@ -222,7 +222,7 @@ const Home = () => {
             open={open}
           >
             <CircularProgress color="inherit" />
-          </Backdrop>
+      </Backdrop>
     </Container>
   );
 };

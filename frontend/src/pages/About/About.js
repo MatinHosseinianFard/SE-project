@@ -19,7 +19,7 @@ const About = () => {
             <img src={image} alt="" />
             <h3 style={style} >متین حسینیان فرد</h3>
             <h3 style={style} id="email">ایمیل : <a href="mailto:matinhosseini795@gmail.com">matinhosseini795@gmail.com</a></h3>
-            <h3 style={style} id="telegram">گیتهاب : <a href="https://github.com/matinhosseinian">matinhosseinian</a></h3>
+            <h3 style={style} id="telegram">گیتهاب : <a href="https://github.com/MatinHosseinianFard/SE-project">matinhosseinian</a></h3>
             <h3 style={style} id="telegram">تلگرام : <a href="https://t.me/matin_h_f81_old">matin_h_f81</a></h3>
         </div>
       </div>

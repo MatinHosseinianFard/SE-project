@@ -1,13 +1,22 @@
 import React, { useState, useEffect } from "react";
-
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 import { Link } from 'react-router-dom';
 
 import axios from '../../axios.js';
+import Container from "../../containers/Container/Container.js";
+import { setSignupNow } from "../../store/store.js";
+
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+
 
 import "./Signup.css";
 
 const Signup = () => {
+
+  const [open, setOpen] = useState(false);
+
 
   const [username, setUsername] = useState("");
   const [usernameError, setUsernameError] = useState(false);
@@ -30,6 +39,8 @@ const Signup = () => {
   const [lastNameErrorMessage, setLastNameErrorMessage] = useState(false);
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
 
   useEffect(() => {
     document.title = 'ثبت نام';
@@ -97,8 +108,9 @@ const Signup = () => {
         setPassword1ErrorMessage("");
       }
     }
-
+    
     if (access) {
+        setOpen(true);
         axios
         .post('/api/dj-rest-auth/registration/', {
           username: username,
@@ -108,10 +120,12 @@ const Signup = () => {
           last_name: lastName
         })
         .then(response => {
-          alert("با موفقیت انجام شد.")
-          navigate("/")
+          setOpen(false);
+          dispatch(setSignupNow(true));
+          navigate("/");
         })
         .catch(error => {
+          setOpen(false);
           console.log(error.response.data);
           if (error.response.data.username) {
             setUsernameError(true);
@@ -143,6 +157,13 @@ const Signup = () => {
 
   }
   return (
+    <Container>
+    <Backdrop
+            sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={open}
+          >
+            <CircularProgress color="inherit" />
+    </Backdrop>
     <section className="signup">
       <div className="signup-grid">
         <div className="signup-container signup-grid">
@@ -228,6 +249,7 @@ const Signup = () => {
         </div>
       </div>
     </section>
+    </Container>
   );
 };
 

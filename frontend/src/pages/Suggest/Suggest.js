@@ -1,18 +1,20 @@
-/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
 import { TiTick } from 'react-icons/ti';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-import Container from "../../containers/Container/Container.js";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
+
 import axios from "../../axios.js";
+import Container from "../../containers/Container/Container.js";
 
 import { logout } from "../../store/store.js";
 
 const Suggest = () => {
 
-  const [message, setMessage] = useState(false);
+  // const [message, setMessage] = useState(false);
   const [possible, setPossible] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [currentTable, setCurrentTable] = useState(false);
@@ -20,8 +22,9 @@ const Suggest = () => {
   const tables = useSelector(state => state.tables);
 
   const navigate = useNavigate();
-  const distpatch = useDispatch()
-  
+  const distpatch = useDispatch();
+
+
   useEffect(() => {
     document.title = 'پیشنهادات';
   }, []);
@@ -34,8 +37,14 @@ const Suggest = () => {
   
   useEffect(() => {
     setCurrentTable(tables[currentPage-1]);
-    setMessage(false);
+    // setMessage(false);
   }, [currentPage, tables]);
+
+  const showToastMessage = () => {
+    toast.success('افزوده شد.', {
+        position: toast.POSITION.TOP_RIGHT
+    });
+  };
 
   const addFavouriteHandler = (event) => {
     event.preventDefault();
@@ -54,7 +63,7 @@ const Suggest = () => {
     axios
         .post('/api/add-favourite/', query)
         .then(response => {
-           setMessage(true);    
+           showToastMessage();   
         })
         .catch(error => {
           console.log(error);
@@ -70,18 +79,9 @@ const Suggest = () => {
 
   return (
     <Container>
+      <ToastContainer autoClose={1000} rtl="rtl"/>
       {currentTable ? (
-        <div className="container">
-          {message ? (
-            <Container>
-              <br/>
-              <div className="alert alert-success d-flex align-items-center" role="alert">
-                <div>
-                <TiTick className="icon" /> افزوده شد.
-                </div>
-              </div>
-            </Container>
-          ) : null}
+        <div className="container">          
           <br/>
           <h5>تعداد واحد: {currentTable.total_credit}</h5><br/>
           <div style={{ overflowX: 'auto' }} className="container">

@@ -16,6 +16,8 @@ const initialState = {
   user_id: "",
   user_first_name: "",
   user_last_name: "",
+  signup_now: false,
+  login_now: false
 };
 
 // Define actions
@@ -27,6 +29,8 @@ const SET_SEARCH_VALUE = "SET_SEARCH_VALUE";
 const SET_TABLES = "SET_TABLES";
 const SET_IN_SUGGEST = "SET_IN_SUGGEST";
 const SET_PATHNAME = "SET_PATHNAME";
+const SET_SIGNUP_NOW = "SET_SIGNUP_NOW";
+const SET_LOGIN_NOW = "SET_LOGIN_NOW";
 
 // Define action creators
 export const login = (token, refresh) => ({
@@ -67,6 +71,17 @@ export const setPathName = (pathname) => ({
   type: SET_PATHNAME,
   payload: pathname,
 });
+
+export const setSignupNow = (signup_now) => ({
+  type: SET_SIGNUP_NOW,
+  payload: signup_now,
+});
+
+export const setLoginNiw = (login_now) => ({
+  type: SET_LOGIN_NOW,
+  payload: login_now,
+});
+
 
 // Define reducers
 const rootReducer = (state = initialState, action) => {
@@ -143,6 +158,20 @@ const rootReducer = (state = initialState, action) => {
       return {
         ...state,
         pathname
+      };
+
+      case SET_SIGNUP_NOW:
+        const signup_now = action.payload;
+      return {
+        ...state,
+        signup_now
+      };
+
+      case SET_LOGIN_NOW:
+        const login_now = action.payload;
+      return {
+        ...state,
+        login_now
       };
     default:
       return state;
