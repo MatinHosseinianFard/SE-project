@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
@@ -25,12 +27,21 @@ const Home = () => {
   const distpatch = useDispatch()
   const navigate = useNavigate()
 
+  const showToastMessage = (message) => {
+    toast.error(message, {
+        position: toast.POSITION.TOP_RIGHT
+    });
+  };
+
   useEffect(() => {
     document.title = 'صفحه اصلی';
     axios
       .get("/api/home")
       .then((response) => {
         setData(response.data);
+        // if (response.data.notice) {
+        //     showToastMessage('حداقل ۱۲ واحد انتخاب کنید.');
+        // }
         setOpen(false)
       })
       .catch((error) => {
@@ -77,10 +88,12 @@ const Home = () => {
             setOpen(false);
             if (response.data.length === 1 && response.data[0].notice) {
                 setNotice(true);
+                showToastMessage(response.data[0].message)
                 setMessage(response.data[0].message);
             }
             else if (response.data.length === 1 && response.data[0].impossible){
                 setImpossible(true);
+                showToastMessage(response.data[0].message)
                 setMessage(response.data[0].message);
             }
             else{
@@ -99,6 +112,8 @@ const Home = () => {
   const selectHandler = (event) => {
     setSelectedSection([...SelectedSection, event.target.value])
   }
+
+  
 
   return (
     <Container>
@@ -120,24 +135,18 @@ const Home = () => {
                 این دروس مربوط به ترم 4021 است. برای اضافه یا تصحیح درس به آدرس تلگرام قرار داده شده در قسمت درباره ما پیام دهید.
                 </div>
             </div>
-            
-            {(Notice || Impossible) ? (<div className="alert alert-danger d-flex align-items-center" role="alert">
-                <svg className="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use href="#exclamation-triangle-fill"/></svg>
-                <div>
-                {Message}
-                </div>
-            </div>) : null}
-            
-            {Data.notice ? (
+
+            <ToastContainer autoClose={2000} rtl="rtl"/>
+            {/* {(Notice || Impossible) ? (
                 <Container>
-                    <div className="alert alert-danger d-flex align-items-center" role="alert">
-                <svg className="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use href="#exclamation-triangle-fill"/></svg>
-                <div>
-                حداقل 12 واحد انتخاب کنید
-                </div>
-            </div>
+                    {showToastMessage(Message)}
+                </Container>) : null} */}
+            
+            {/* {Data.notice ? (
+                <Container>
+                    {showToastMessage('حداقل ۱۲ واحد انتخاب کنید.')}
                 </Container>
-            ) : null}
+            ) : null} */}
             
             <br/>
                 <form method="POST" onSubmit={(event) => sumbitHandler(event)}>

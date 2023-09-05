@@ -298,12 +298,12 @@ def suggest(request):
                 filter(lambda item: item["total_credit"] == int(search), tables))
         
         message = False
-        
+        notice = True
         if len(tables) == 0:
             if search in (None, 'None', ''):
-                message = "برنامه ای با این دروس امکان پذیر نیست"
+                message = "برنامه ای با این دروس امکان پذیر نیست."
             else:
-                message = "برنامه ای با این دروس و تعداد واحد مدنظر وجود ندارد"
+                message = "برنامه ای با این دروس و تعداد واحد مدنظر وجود ندارد."
         tables.pop()
         tables.append({"message": message, "search": search, "notice": notice})
         return Response(tables)
@@ -380,7 +380,8 @@ def seeFavourite(request):
                     "time": [
                         f"{time.day} {time.start}-{time.end}" for time in section.times.all()],
                     "course_pk": course.pk,
-                    "section_pk": section.pk
+                    "section_pk": section.pk,
+                    "room": section.room
                 }
                 course_sections_info.append(section_info)
 
@@ -424,6 +425,7 @@ def seeFavourite(request):
                     "exam_time": section["exam_time"],
                     "course_pk": section["course_pk"],
                     "section_pk": section["section_pk"],
+                    "room": section["room"],
                     "exam_conflict": False
                 },
             )
