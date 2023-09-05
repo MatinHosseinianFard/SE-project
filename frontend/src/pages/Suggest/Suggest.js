@@ -40,6 +40,7 @@ const Suggest = () => {
   
   useEffect(() => {
     setCurrentTable(tables[currentPage-1]);
+    console.log(currentTable);
     // setMessage(false);
   }, [currentPage, tables]);
 
@@ -212,6 +213,7 @@ const Suggest = () => {
                         <tr>
                           <th scope="col">#</th>
                           <th className="text-center" scope="col">تعداد واحد</th>
+                          <th className="text-center" scope="col">کلاس</th>
                           <th className="text-center" scope="col">تاریخ امتحان</th>
                           <th className="text-center" scope="col">استاد</th>
                           <th className="text-center" scope="col">جنسیت</th>
@@ -227,6 +229,7 @@ const Suggest = () => {
                               <tr key={section.code}>
                                 <th scope="row">{section.name} {section_group}</th>
                                 <td className="text-center">{section.credit}</td>
+                                <td className="text-center">{section.room}</td>
                                   {section.exam_date !== "0" ? (
                                   !section.exam_conflict ? (<td className="text-center">{section.exam_date} | {section.exam_time}</td>) 
                                   : (<td className="text-center text-danger">{section.exam_date} | {section.exam_time}</td>)

@@ -67,7 +67,7 @@ def home(request):
     
     for department in Departemant.objects.all():
         response[department.name] = {}
-        for course in department.courses.filter(status=True):
+        for course in department.courses.filter(status=True).order_by('-credits'):
             sections = Section.objects.filter(course=course)
             response[department.name][str(course)] = {}
             response[department.name][str(course)]["sections"] = []
@@ -152,7 +152,8 @@ def suggest(request):
                         "time": [
                             f"{time.day} {time.start}-{time.end}" for time in section.times.all()],
                         "course_pk": course.pk,
-                        "section_pk": section.pk
+                        "section_pk": section.pk,
+                        "room": section.room
                     }
                     course_sections_info.append(section_info)
 
@@ -240,6 +241,7 @@ def suggest(request):
                             "exam_time": section["exam_time"],
                             "course_pk": section["course_pk"],
                             "section_pk": section["section_pk"],
+                            "room": section["room"],
                             "exam_conflict": False
                         },
                     )

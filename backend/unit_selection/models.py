@@ -54,6 +54,7 @@ class Section(models.Model):
     code = models.CharField(max_length=255, default="0")
     gender = models.CharField(
         max_length=10, choices=GENDER_CHOICES, default="مختلط")
+    room = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self) -> str:
         return f"{self.course} {self.code[-2:]}"
