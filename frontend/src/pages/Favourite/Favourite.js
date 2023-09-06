@@ -32,7 +32,6 @@ const Favourite = () => {
     axios
       .get("/api/see-favourite")
       .then((response) => {
-        // console.log(response);
         let data = response.data;
         const info = data.pop(); 
         setError(info.error);
@@ -45,11 +44,13 @@ const Favourite = () => {
         navigate("/");
       });
 
-      // return setDeleteEvent(false);
   }, [deleteEvent]);
 
   
   useEffect(() => {
+    if (currentPage === tables.length + 1) {
+      setCurrentPage(currentPage - 1)
+    }
     setCurrentTable(tables[currentPage-1]);
   }, [currentPage, tables]);
   
@@ -60,22 +61,17 @@ const Favourite = () => {
   };
 
   const removeFavouriteHandler = (event) => {
-    setOpen(true);
     event.preventDefault();
+    setOpen(true);
     let query = {
       favourite_pk: currentTable.favourite_pk
   }
-  // setOpen(true)
-  // setInterval(() => {
-  //   setOpen(false)
-  // }, 200);
     axios
         .post('/api/remove-favourite/', query)
         .then(response => {
           setOpen(false);
-          console.log(response)
-           setDeleteEvent(!deleteEvent);
-           showToastMessage();
+          setDeleteEvent(!deleteEvent);
+          showToastMessage();
         })
         .catch(error => {
           setOpen(false);

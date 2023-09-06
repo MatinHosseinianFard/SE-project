@@ -40,8 +40,6 @@ const Suggest = () => {
   
   useEffect(() => {
     setCurrentTable(tables[currentPage-1]);
-    console.log(currentTable);
-    // setMessage(false);
   }, [currentPage, tables]);
 
   const showToastMessage = () => {

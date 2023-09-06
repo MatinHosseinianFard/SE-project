@@ -126,7 +126,6 @@ const Signup = () => {
         })
         .catch(error => {
           setOpen(false);
-          console.log(error.response.data);
           if (error.response.data.username) {
             setUsernameError(true);
             setUsernameErrorMessage(error.response.data.username.join(" "));
