@@ -11,7 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 
-from unit_selection.models import Departemant, Course, Section, Favourite
+from unit_selection.models import Departemant, Course, Section, Favourite, Group
 
 flag = {
     "شنبه": {
@@ -64,29 +64,30 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 def home(request):
     
     response = {}
-    
-    for department in Departemant.objects.all():
-        response[department.name] = {}
-        for course in department.courses.filter(status=True).order_by('-credits'):
-            sections = Section.objects.filter(course=course)
-            response[department.name][str(course)] = {}
-            response[department.name][str(course)]["sections"] = []
-            response[department.name][str(course)]["pk"] = course.pk
-            response[department.name][str(course)]["credits"] = course.credits
-            response[department.name][str(course)]["exam_date"] = course.exam_date
-            response[department.name][str(course)]["exam_time"] = course.exam_time
-            for section in sections:
-                response[department.name][str(course)]["sections"].append({
-                    "pk" : section.pk,
-                    "instuctor" : section.instructor.name,
-                    "code": section.code,
-                    "gender": section.gender,
-                    "time_slot": [{
-                        "day" : time.day,
-                        "start": time.start,
-                        "end" : time.end
-                    } for time in section.times.all()]
-                    })
+    for departemant in Departemant.objects.all():
+        response[departemant.name] = {}
+        for group in departemant.groups.all():
+            response[departemant.name][group.name] = {}
+            for course in group.courses.filter(status=True).order_by('-credits'):
+                sections = Section.objects.filter(course=course)
+                response[departemant.name][group.name][str(course)] = {}
+                response[departemant.name][group.name][str(course)]["sections"] = []
+                response[departemant.name][group.name][str(course)]["pk"] = course.pk
+                response[departemant.name][group.name][str(course)]["credits"] = course.credits
+                response[departemant.name][group.name][str(course)]["exam_date"] = course.exam_date
+                response[departemant.name][group.name][str(course)]["exam_time"] = course.exam_time
+                for section in sections:
+                    response[departemant.name][group.name][str(course)]["sections"].append({
+                        "pk" : section.pk,
+                        "instuctor" : section.instructor.name,
+                        "code": section.code,
+                        "gender": section.gender,
+                        "time_slot": [{
+                            "day" : time.day,
+                            "start": time.start,
+                            "end" : time.end
+                        } for time in section.times.all()]
+                        })
     
     response["notice"] = request.session.get("notice")
     return Response(response, status=200)
@@ -216,12 +217,12 @@ def suggest(request):
                             times = section["time"]
                         except:
                             continue
-
+                    print(times)
                     for time in times:
                         day, section_time = time.split(" ")
                         if not copy_flag[day][section_time]:
                             copy_flag[day][section_time] = "{}".format(
-                                section["name"] if len(section["name"]) <= 30 else section["name"][:30]+"..")
+                                section["name"] if len(section["name"]) <= 40 else section["name"][:40]+"..")
                         else:
                             possiblie = False
                             break

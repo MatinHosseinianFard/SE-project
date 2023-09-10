@@ -14,14 +14,22 @@ class Favourite(models.Model):
 
 class Departemant(models.Model):
     name = models.CharField(max_length=255)
+    # group = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self) -> str:
         return self.name
 
+class Group(models.Model):
+    name = models.CharField(max_length=255)
+    departemant = models.ForeignKey(
+        Departemant, on_delete=models.CASCADE, related_name="groups")
+    
+    def __str__(self) -> str:
+        return self.name
 
 class Instructor(models.Model):
     name = models.CharField(max_length=255)
-    dept_name = models.ForeignKey(
+    departemant = models.ForeignKey(
         Departemant, on_delete=models.CASCADE, related_name="instructors")
 
     def __str__(self) -> str:
@@ -32,13 +40,13 @@ class Course(models.Model):
     name = models.CharField(max_length=255)
     credits = models.PositiveIntegerField(default=1)
     status = models.BooleanField(default=False)
-    dept_name = models.ForeignKey(
-        Departemant, on_delete=models.CASCADE, null=True, related_name="courses")
-    exam_date = models.CharField(max_length=10, default="0")
-    exam_time = models.CharField(max_length=10, default="0")
+    group = models.ForeignKey(
+        Group, on_delete=models.CASCADE, null=True, related_name="courses")
+    exam_date = models.CharField(max_length=15, default="0")
+    exam_time = models.CharField(max_length=15, default="0")
 
     def __str__(self) -> str:
-        return self.name
+        return self.name[:35] if len(self.name) < 35 else self.name[:35] + "..."
 
 
 class Section(models.Model):

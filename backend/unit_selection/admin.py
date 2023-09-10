@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Course, Departemant, Section, Time_Slot, Instructor, Favourite
+from .models import Course, Departemant, Section, Time_Slot, Instructor, Favourite, Group
 import nested_admin
 
 class Time_SlotInline(nested_admin.NestedStackedInline):
@@ -15,8 +15,8 @@ class CourseAdmin(nested_admin.NestedModelAdmin):
     inlines = [
         SectionInline,
     ]
-    list_display = ("name", "dept_name", "credits", "status")
-    list_filter = ("dept_name", "credits", "status")
+    list_display = ("name", "group", "credits", "status")
+    list_filter = ("group", "credits", "status")
     search_fields = ["name"]
 
     actions = ['make_visible', 'make_hidden']
@@ -32,8 +32,8 @@ class CourseAdmin(nested_admin.NestedModelAdmin):
 
 
 class InstructorAdmin(admin.ModelAdmin):
-    list_display = ("name", "dept_name",)
-    list_filter = ("dept_name",)
+    list_display = ("name", "departemant",)
+    list_filter = ("departemant",)
     search_fields = ["name"]
 
 
@@ -53,6 +53,7 @@ class Time_SlotAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Departemant)
+admin.site.register(Group)
 admin.site.register(Favourite)
 admin.site.register(Instructor, InstructorAdmin)
 admin.site.register(Course, CourseAdmin)
