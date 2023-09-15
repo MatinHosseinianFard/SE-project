@@ -4,14 +4,15 @@ from django.shortcuts import redirect
 from itertools import permutations
 from rest_framework.decorators import api_view
 from django.http import HttpResponse
+from django.views.decorators.cache import cache_page
 from .serializers import CustomTokenObtainPairSerializer
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-
 from unit_selection.models import Departemant, Course, Section, Favourite, Group
+
 
 flag = {
     "شنبه": {
@@ -59,38 +60,55 @@ class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
 
+@cache_page(60 * 5)
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def home(request):
-    
+    departemantPara = request.GET.get('departemantPara')
+    groupPara = request.GET.get('groupPara')
+    print("departemantPara :", departemantPara)
+    print("groupPara :", groupPara)
     response = {}
-    for departemant in Departemant.objects.all():
-        response[departemant.name] = {}
-        for group in departemant.groups.all():
-            response[departemant.name][group.name] = {}
-            for course in group.courses.filter(status=True).order_by('-credits'):
-                sections = Section.objects.filter(course=course)
-                response[departemant.name][group.name][str(course)] = {}
-                response[departemant.name][group.name][str(course)]["sections"] = []
-                response[departemant.name][group.name][str(course)]["pk"] = course.pk
-                response[departemant.name][group.name][str(course)]["credits"] = course.credits
-                response[departemant.name][group.name][str(course)]["exam_date"] = course.exam_date
-                response[departemant.name][group.name][str(course)]["exam_time"] = course.exam_time
-                for section in sections:
-                    response[departemant.name][group.name][str(course)]["sections"].append({
-                        "pk" : section.pk,
-                        "instuctor" : section.instructor.name,
-                        "code": section.code,
-                        "gender": section.gender,
-                        "time_slot": [{
-                            "day" : time.day,
-                            "start": time.start,
-                            "end" : time.end
-                        } for time in section.times.all()]
-                        })
+
+    if departemantPara is None and groupPara is None:
+        for departemant in Departemant.objects.all():
+            response[departemant.name] = {}
+            for group in departemant.groups.all():
+                response[departemant.name][group.name] = {}
+
+        response["notice"] = request.session.get("notice")
+        return Response(response, status=200)   
     
-    response["notice"] = request.session.get("notice")
-    return Response(response, status=200)
+    else:
+        departemant = Departemant.objects.get(name=departemantPara)
+        response[departemant.name] = {}
+
+        group = departemant.groups.get(name=groupPara)
+        response[departemant.name][group.name] = {}
+
+        for course in group.courses.filter(status=True).order_by('-credits'):
+            sections = Section.objects.filter(course=course)
+            response[departemant.name][group.name][str(course)] = {}
+            response[departemant.name][group.name][str(course)]["sections"] = []
+            response[departemant.name][group.name][str(course)]["pk"] = course.pk
+            response[departemant.name][group.name][str(course)]["credits"] = course.credits
+            response[departemant.name][group.name][str(course)]["exam_date"] = course.exam_date
+            response[departemant.name][group.name][str(course)]["exam_time"] = course.exam_time
+            for section in sections:
+                response[departemant.name][group.name][str(course)]["sections"].append({
+                    "pk" : section.pk,
+                    "instuctor" : section.instructor.name,
+                    "code": section.code,
+                    "gender": section.gender,
+                    "time_slot": [{
+                        "day" : time.day,
+                        "start": time.start,
+                        "end" : time.end
+                    } for time in section.times.all()]
+                    })
+    
+        response["notice"] = request.session.get("notice")
+        return Response(response, status=200)
 
 
 @api_view(['GET', 'POST'])
@@ -119,7 +137,7 @@ def suggest(request):
                 tables = None
             else:
                 return HttpResponse("error")
-            print(choosed)
+            # print(choosed)
 
             if choosed["selected_courses"] != '':
                 selected_courses = {int(i)
@@ -217,7 +235,7 @@ def suggest(request):
                             times = section["time"]
                         except:
                             continue
-                    print(times)
+                    # print(times)
                     for time in times:
                         day, section_time = time.split(" ")
                         if not copy_flag[day][section_time]:

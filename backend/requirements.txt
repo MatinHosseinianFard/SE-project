@@ -12,3 +12,4 @@ drf-yasg==1.21.5
 Pillow==9.0.1
 PyJWT==2.3.0
 beautifulsoup4
+django-clearcache

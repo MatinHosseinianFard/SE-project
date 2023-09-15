@@ -35,6 +35,7 @@ CSRF_TRUSTED_ORIGINS = ['chrome-extension://eejfoncpjfgmeleakejdcanedmefagga']
 # Application definition
 
 INSTALLED_APPS = [
+    'clearcache',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -63,6 +64,14 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = "accounts.CustomUser"
 
+
+CACHES = {
+   'default': {
+      'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+      'LOCATION': '/var/tmp/django_cache',
+   }
+}
+
 MIDDLEWARE = [
 
     'django.middleware.security.SecurityMiddleware',
@@ -73,6 +82,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
+    'django.middleware.cache.UpdateCacheMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
 
     'unit_selection.middleware.AdminLocaleMiddleware',
 ]

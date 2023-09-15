@@ -167,6 +167,31 @@ const Home = () => {
         }
     }
 
+    const groupClick = (departemantKey, groupKey) => {
+        if (Object.keys(Data[departemantKey][groupKey]).length !== 0) {
+            return
+        }
+        setOpen(true);
+        axios
+            .get("/api/home", {
+                params: {
+                    departemantPara: departemantKey,
+                    groupPara: groupKey,
+                  }
+            })
+            .then((response) => {
+                const newData = { ...Data };
+                newData[departemantKey][groupKey] = response.data[departemantKey][groupKey];
+                setData(newData);
+                setOpen(false)
+            })
+            .catch((error) => {
+                console.error("خطا در دریافت اطلاعات:", error);
+                distpatch(logout());
+                navigate("/");
+            });
+    }
+
 
     return (
         <Container>
@@ -215,7 +240,7 @@ const Home = () => {
                                                                                 return (
                                                                                     <div className="accordion-item">
                                                                                         <h2 className="accordion-header" id={`panelsStayOpen-heading${accordionNumber[groupDicIndex]}`}>
-                                                                                            <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target={`#panelsStayOpen-collapse${accordionNumber[groupDicIndex]}`} aria-expanded="false" aria-controls={`panelsStayOpen-collapse${accordionNumber[groupDicIndex]}`}>
+                                                                                            <button onClick={(event) => groupClick(departemantKey, groupKey)} className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target={`#panelsStayOpen-collapse${accordionNumber[groupDicIndex]}`} aria-expanded="false" aria-controls={`panelsStayOpen-collapse${accordionNumber[groupDicIndex]}`}>
                                                                                                 {groupKey}
                                                                                             </button>
                                                                                         </h2>
